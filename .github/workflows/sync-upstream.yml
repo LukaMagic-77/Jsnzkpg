@@ -1,0 +1,27 @@
+yaml
+  
+name: 同步裤佬原仓库更新
+on:
+  schedule:
+    - cron: '0 0 * * *'  # UTC时间每日零点自动同步（国内早8点）
+  workflow_dispatch:      # 支持手动点按钮一键同步
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Git基础配置
+        run: |
+          git config user.name "AutoSyncBot"
+          git config user.email "autosync@example.com"
+      - name: 添加原仓库为上游源
+        run: git remote add upstream https://github.com/Jsnzkpg/Jsnzkpg.git
+      - name: 拉取原作者最新内容
+        run: git fetch upstream
+      - name: 合并更新到你的main分支
+        run: git merge upstream/main --allow-unrelated-histories
+      - name: 推送更新到你的个人Fork仓库
+        run: git push origin main
